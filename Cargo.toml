@@ -1,0 +1,6 @@
+[package]
+name = "gpeg2"
+version = "0.1.0"
+authors = ["tadataku-lab <tadataku.lab@gmail.com>"]
+
+[dependencies]
