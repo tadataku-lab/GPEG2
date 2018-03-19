@@ -1,12 +1,10 @@
-pub mod parser_context;
-pub mod tree;
-pub mod gpeg_parser;
+extern crate gpeg2;
 
 use std::cell::Cell;
 use std::cell::RefCell;
-use parser_context::parser_context::ParserContext;
-use tree::tree::Tree;
-use gpeg_parser::gpeg_parser::*;
+use gpeg2::parser_context::parser_context::ParserContext;
+use gpeg2::tree::tree::Tree;
+use gpeg2::gpeg_parser::gpeg_parser::*;
 
 fn e0() -> Box<Fn(& ParserContext) -> bool> {
     choice(nonterm(1, nonterm(0, nonterm(0, succ()))), nonterm(1, succ()), succ())
