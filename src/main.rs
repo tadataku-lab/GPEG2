@@ -67,7 +67,7 @@ impl Tree{
     fn to_string(&self) -> String {
         match self {
             &Tree::Leaf(c) => format!("{}", c),
-            &Tree::Node{ref sym, ref child} => format!("[{} {}]", SYMBOLS[*sym], child.iter().fold("".to_string(), |ts, t| format!("{} {}",ts, t.to_string()))),
+            &Tree::Node{ref sym, ref child} => format!("[{}{}]", SYMBOLS[*sym], child.iter().fold("".to_string(), |ts, t| format!("{} {}",ts, t.to_string()))),
         }
     }
 }
