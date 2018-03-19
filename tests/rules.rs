@@ -1,7 +1,7 @@
 extern crate gpeg2;
 
 #[cfg(test)]
-mod tests {
+mod rules {
 
     use gpeg2::parser_context::parser_context::ParserContext;
     use gpeg2::tree::tree::Tree;
