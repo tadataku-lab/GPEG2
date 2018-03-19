@@ -17,14 +17,6 @@ fn e3() -> Box<Fn(& ParserContext) -> bool> {
 }
 */
 
-fn dispatch(num: usize) -> Box<Fn(& ParserContext) -> bool> {
-    match num {
-        0 => e0(),
-        1 => e1(),
-        _ => panic!("this number can't dispatch {} ", num)
-    }
-}
-
 fn e0() -> Box<Fn(& ParserContext) -> bool> {
     choice(nonterm(1, nonterm(0, nonterm(0, succ()))), nonterm(1, succ()), succ())
 }
@@ -32,6 +24,7 @@ fn e0() -> Box<Fn(& ParserContext) -> bool> {
 fn e1() -> Box<Fn(& ParserContext) -> bool> {
     choice(ch('b', nonterm(1, succ())), ch('b', succ()), succ())
 }
+
 
 /**
 const SYMBOLS: [&'static str; 1] = ["S"];
@@ -48,9 +41,9 @@ fn e0() -> Box<Fn(& ParserContext) -> bool> {
 }
 */
 
-#[derive(Debug)]
 struct ParserContext{
     input: Vec<u8>,
+    rules: Vec<Box<Fn(& ParserContext) -> bool>>,
     pos: Cell<i32>,
     tree: RefCell<Vec<Tree>>
 }
@@ -71,9 +64,9 @@ impl Tree{
 }
 
 fn main() {
-    let p = ParserContext{ input: String::from("bbb").into_bytes(), pos: Cell::new(0), tree: RefCell::new(Vec::new())};
+    let p = ParserContext{ input: String::from("bbb").into_bytes(), rules: vec![e0(),e1()],pos: Cell::new(0), tree: RefCell::new(Vec::new())};
     //println!("{}", char1(&mut p, 'a' as u8) && char1(&mut p, 'b' as u8))
-    println!("{}", e0()(&p));
+    println!("{}", p.rules[0](&p));
     println!("{}", Tree::Node{sym: 0, child: p.tree.into_inner()}.to_string(&["S", "S'"]));
 }
 
@@ -123,7 +116,7 @@ fn nonterm(symbol: usize, e: Box<Fn(& ParserContext) -> bool>) -> Box<Fn(& Parse
     Box::new(move |p: & ParserContext| -> bool {
         let prev_tree = p.tree.clone();
         p.tree.borrow_mut().clear();
-        if dispatch(symbol)(p) {make_node(symbol, prev_tree, p) && e(p)} else {false}
+        if p.rules[symbol](p) {make_node(symbol, prev_tree, p) && e(p)} else {false}
     })
 }
 
