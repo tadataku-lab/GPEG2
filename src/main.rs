@@ -17,8 +17,6 @@ fn e3() -> Box<Fn(& ParserContext) -> bool> {
 }
 */
 
-const SYMBOLS: [&'static str; 2] = ["S", "S'"];
-
 fn dispatch(num: usize) -> Box<Fn(& ParserContext) -> bool> {
     match num {
         0 => e0(),
@@ -64,10 +62,10 @@ pub enum Tree{
 }
 
 impl Tree{
-    fn to_string(&self) -> String {
+    fn to_string(&self, symbol: &[&'static str]) -> String {
         match self {
             &Tree::Leaf(c) => format!("{}", c),
-            &Tree::Node{ref sym, ref child} => format!("[{}{}]", SYMBOLS[*sym], child.iter().fold("".to_string(), |ts, t| format!("{} {}",ts, t.to_string()))),
+            &Tree::Node{ref sym, ref child} => format!("[{}{}]", symbol[*sym], child.iter().fold("".to_string(), |ts, t| format!("{} {}",ts, t.to_string(symbol)))),
         }
     }
 }
@@ -76,7 +74,7 @@ fn main() {
     let p = ParserContext{ input: String::from("bbb").into_bytes(), pos: Cell::new(0), tree: RefCell::new(Vec::new())};
     //println!("{}", char1(&mut p, 'a' as u8) && char1(&mut p, 'b' as u8))
     println!("{}", e0()(&p));
-    println!("{}", Tree::Node{sym: 0, child: p.tree.into_inner()}.to_string());
+    println!("{}", Tree::Node{sym: 0, child: p.tree.into_inner()}.to_string(&["S", "S'"]));
 }
 
 fn make_leaf(c: char, p: & ParserContext) -> bool{
