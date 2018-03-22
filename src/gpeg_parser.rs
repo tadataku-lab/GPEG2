@@ -5,8 +5,7 @@ pub mod gpeg_parser{
     use std::cell::RefCell;
 
     fn make_leaf(c: char, p: & ParserContext) -> bool{
-        let mut mut_child = p.state.borrow_mut();
-        mut_child.tree.push(Tree::Leaf(c));
+        p.state.borrow_mut().make_leaf(c);
         true
     }
 
@@ -17,11 +16,6 @@ pub mod gpeg_parser{
             mut_child.tree.clear();
             mut_child.tree.append(&mut prev); 
         }
-        true
-    }
-
-    fn next1(p: & ParserContext) -> bool{
-        p.state.borrow_mut().pos += 1;
         true
     }
 
@@ -37,7 +31,7 @@ pub mod gpeg_parser{
             if p.state.borrow_mut().pos as usize >= p.input.len() {
                 false
             }else {
-            if p.input[p.state.borrow_mut().pos as usize] == c as u8 { make_leaf(c, p) && next1(p) && e(p) } else {false} 
+            if p.input[p.state.borrow_mut().pos as usize] == c as u8 { make_leaf(c, p) && e(p) } else {false} 
             }
         })
     }

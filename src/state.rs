@@ -12,5 +12,10 @@ pub mod state{
         pub fn set(&mut self, other: State){
             *self = other;
         }
+
+        pub fn make_leaf(&mut self, c: char){
+            self.pos += 1;
+            self.tree.push(Tree::Leaf(c));
+        }
     }
 }
