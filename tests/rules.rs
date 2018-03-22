@@ -24,4 +24,34 @@ mod rules {
         p.rules[0](&p);
         assert!(Tree::Node{sym: 0, child: p.tree.into_inner()}.to_string(&["S", "S'"]) == "[S [S' b [S' b [S' b]]]]");
     }
+
+    #[test]
+    // S <- a | ab
+    fn rules2() {
+        let p = ParserContext{
+            input: String::from("ab").into_bytes(),
+            rules: vec![
+                alt(ch('a', succ()), ch('a', ch('b', succ()))),
+                ],
+            pos: Cell::new(0),
+            tree: RefCell::new(Vec::new())
+        };
+        p.rules[0](&p);
+        assert!(Tree::Node{sym: 0, child: p.tree.into_inner()}.to_string(&["S"]) == "[S Amb[ a, ab]]");
+    }
+
+    #[test]
+    // S <- ab / a
+    fn rules3() {
+        let p = ParserContext{
+            input: String::from("a").into_bytes(),
+            rules: vec![
+                choice(ch('a', ch('b', succ())), ch('a', succ()),succ()),
+                ],
+            pos: Cell::new(0),
+            tree: RefCell::new(Vec::new())
+        };
+        p.rules[0](&p);
+        assert!(Tree::Node{sym: 0, child: p.tree.into_inner()}.to_string(&["S"]) == "[S a]");
+    }
 }

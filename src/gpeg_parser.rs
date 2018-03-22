@@ -57,10 +57,23 @@ pub mod gpeg_parser{
     pub fn choice(left: Box<Fn(& ParserContext) -> bool>, right: Box<Fn(& ParserContext) -> bool>, e: Box<Fn(& ParserContext) -> bool>) -> Box<Fn(& ParserContext) -> bool> {
         Box::new(move |p: & ParserContext| -> bool {
             let back_pos = p.pos.get();
+            let mut back_tree = p.tree.clone();
             if left(p) { e(p) } else{ 
                 p.pos.set(back_pos);
+                {
+                    let mut prev_tree = p.tree.borrow_mut();
+                    prev_tree.clear();
+                    prev_tree.append(&mut back_tree.into_inner());
+                }
                 right(p) && e(p)
             } 
+        })
+    }
+
+    pub fn alt(left: Box<Fn(& ParserContext) -> bool>, right: Box<Fn(& ParserContext) -> bool>) -> Box<Fn(& ParserContext) -> bool> {
+        Box::new(move |p: & ParserContext| -> bool {
+            //let right_p = p.clone();
+            true
         })
     }
 }
