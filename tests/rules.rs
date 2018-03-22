@@ -35,7 +35,7 @@ mod rules {
             state: RefCell::new(State{pos: 0, tree: Vec::new()})
         };
         p.rules[0](&p);
-        assert!(Tree::Node{sym: 0, child: p.state.into_inner().tree}.to_string(&["S"]) == "[S Amb[ a, ab]]");
+        assert!(Tree::Node{sym: 1, child: p.state.into_inner().tree}.to_string(&["Amb", "S"]) == "[S [Amb a a b]]");
     }
 
     #[test]

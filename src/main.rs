@@ -8,12 +8,12 @@ use gpeg2::gpeg_parser::gpeg_parser::*;
 
 fn main() {
     let p = ParserContext{
-        input: String::from("a").into_bytes(),
+        input: String::from("ab").into_bytes(),
         rules: vec![
-            choice(ch('a', ch('b', succ())), ch('a', succ()),succ()),
+            alt(ch('a', succ()), ch('a', ch('b', succ()))),
             ],
         state: RefCell::new(State{pos: 0, tree: Vec::new()})
     };
     p.rules[0](&p);
-    println!("{}", Tree::Node{sym: 0, child: p.state.into_inner().tree}.to_string(&["S"]));
+    println!("{}", Tree::Node{sym: 1, child: p.state.into_inner().tree}.to_string(&["Amb", "S"]));
 }
