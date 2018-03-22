@@ -11,11 +11,7 @@ pub mod gpeg_parser{
     }
 
     fn make_node(sym: usize, mut prev: Vec<Tree>, p: & ParserContext) -> bool {
-        {
-            //let mut mut_prev = prev.borrow_mut();
-            let moved_tree = p.state.borrow_mut().tree.clone();
-            prev.push(Tree::Node{sym: sym, child: moved_tree});
-        }
+        prev.push(Tree::Node{sym: sym, child: p.state.borrow_mut().tree.clone()});
         {
             let mut mut_child = p.state.borrow_mut();
             mut_child.tree.clear();
