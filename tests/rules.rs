@@ -5,8 +5,8 @@ mod rules {
 
     use gpeg2::parser_context::parser_context::ParserContext;
     use gpeg2::tree::tree::Tree;
+    use gpeg2::state::state::State;
     use gpeg2::gpeg_parser::gpeg_parser::*;
-    use std::cell::Cell;
     use std::cell::RefCell;
 
     #[test]
@@ -18,11 +18,10 @@ mod rules {
                 choice(nonterm(1, nonterm(0, nonterm(0, succ()))), nonterm(1, succ()), succ()),
                 choice(ch('b', nonterm(1, succ())), ch('b', succ()), succ())
                 ],
-            pos: Cell::new(0),
-            tree: RefCell::new(Vec::new())
+            state: RefCell::new(State{pos: 0, tree: Vec::new()})
         };
         p.rules[0](&p);
-        assert!(Tree::Node{sym: 0, child: p.tree.into_inner()}.to_string(&["S", "S'"]) == "[S [S' b [S' b [S' b]]]]");
+        assert!(Tree::Node{sym: 0, child: p.state.into_inner().tree}.to_string(&["S", "S'"]) == "[S [S' b [S' b [S' b]]]]");
     }
 
     #[test]
@@ -33,11 +32,10 @@ mod rules {
             rules: vec![
                 alt(ch('a', succ()), ch('a', ch('b', succ()))),
                 ],
-            pos: Cell::new(0),
-            tree: RefCell::new(Vec::new())
+            state: RefCell::new(State{pos: 0, tree: Vec::new()})
         };
         p.rules[0](&p);
-        assert!(Tree::Node{sym: 0, child: p.tree.into_inner()}.to_string(&["S"]) == "[S Amb[ a, ab]]");
+        assert!(Tree::Node{sym: 0, child: p.state.into_inner().tree}.to_string(&["S"]) == "[S Amb[ a, ab]]");
     }
 
     #[test]
@@ -48,10 +46,9 @@ mod rules {
             rules: vec![
                 choice(ch('a', ch('b', succ())), ch('a', succ()),succ()),
                 ],
-            pos: Cell::new(0),
-            tree: RefCell::new(Vec::new())
+            state: RefCell::new(State{pos: 0, tree: Vec::new()})
         };
         p.rules[0](&p);
-        assert!(Tree::Node{sym: 0, child: p.tree.into_inner()}.to_string(&["S"]) == "[S a]");
+        assert!(Tree::Node{sym: 0, child: p.state.into_inner().tree}.to_string(&["S"]) == "[S a]");
     }
 }

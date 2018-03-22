@@ -5,27 +5,27 @@ pub mod gpeg_parser{
     use std::cell::RefCell;
 
     fn make_leaf(c: char, p: & ParserContext) -> bool{
-        let mut mut_child = p.tree.borrow_mut();
-        mut_child.push(Tree::Leaf(c));
+        let mut mut_child = p.state.borrow_mut();
+        mut_child.tree.push(Tree::Leaf(c));
         true
     }
 
-    fn make_node(sym: usize, prev: RefCell<Vec<Tree>>, p: & ParserContext) -> bool {
+    fn make_node(sym: usize, mut prev: Vec<Tree>, p: & ParserContext) -> bool {
         {
-            let mut mut_prev = prev.borrow_mut();
-            let moved_tree = p.tree.clone();
-            mut_prev.push(Tree::Node{sym: sym, child: moved_tree.into_inner()});
+            //let mut mut_prev = prev.borrow_mut();
+            let moved_tree = p.state.borrow_mut().tree.clone();
+            prev.push(Tree::Node{sym: sym, child: moved_tree});
         }
         {
-            let mut mut_child = p.tree.borrow_mut();
-            mut_child.clear();
-            mut_child.append(&mut prev.into_inner()); 
+            let mut mut_child = p.state.borrow_mut();
+            mut_child.tree.clear();
+            mut_child.tree.append(&mut prev); 
         }
         true
     }
 
     fn next1(p: & ParserContext) -> bool{
-        p.pos.set(p.pos.get() + 1);
+        p.state.borrow_mut().pos += 1;
         true
     }
 
@@ -38,32 +38,32 @@ pub mod gpeg_parser{
 
     pub fn ch(c: char, e: Box<Fn(& ParserContext) -> bool>) -> Box<Fn(& ParserContext) -> bool> {
         Box::new(move |p: & ParserContext| -> bool {
-            if p.pos.get() as usize >= p.input.len() {
+            if p.state.borrow_mut().pos as usize >= p.input.len() {
                 false
             }else {
-            if p.input[p.pos.get() as usize] == c as u8 { make_leaf(c, p) && next1(p) && e(p) } else {false} 
+            if p.input[p.state.borrow_mut().pos as usize] == c as u8 { make_leaf(c, p) && next1(p) && e(p) } else {false} 
             }
         })
     }
 
     pub fn nonterm(symbol: usize, e: Box<Fn(& ParserContext) -> bool>) -> Box<Fn(& ParserContext) -> bool> {
         Box::new(move |p: & ParserContext| -> bool {
-            let prev_tree = p.tree.clone();
-            p.tree.borrow_mut().clear();
+            let prev_tree = p.state.borrow_mut().tree.clone();
+            p.state.borrow_mut().tree.clear();
             if p.rules[symbol](p) {make_node(symbol, prev_tree, p) && e(p)} else {false}
         })
     }
 
     pub fn choice(left: Box<Fn(& ParserContext) -> bool>, right: Box<Fn(& ParserContext) -> bool>, e: Box<Fn(& ParserContext) -> bool>) -> Box<Fn(& ParserContext) -> bool> {
         Box::new(move |p: & ParserContext| -> bool {
-            let back_pos = p.pos.get();
-            let mut back_tree = p.tree.clone();
+            let back_pos = p.state.borrow_mut().pos;
+            let mut back_tree = p.state.borrow_mut().tree.clone();
             if left(p) { e(p) } else{ 
-                p.pos.set(back_pos);
+                p.state.borrow_mut().pos = back_pos;
                 {
-                    let mut prev_tree = p.tree.borrow_mut();
-                    prev_tree.clear();
-                    prev_tree.append(&mut back_tree.into_inner());
+                    let mut prev_state = p.state.borrow_mut();
+                    prev_state.tree.clear();
+                    prev_state.tree.append(&mut back_tree);
                 }
                 right(p) && e(p)
             } 
