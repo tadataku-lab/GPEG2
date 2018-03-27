@@ -51,4 +51,18 @@ mod rules {
         p.rules[0](&p);
         assert!(Tree::Node{sym: 0, child: p.state.into_inner().tree}.to_string(&["S"]) == "[S a]");
     }
+
+    #[test]
+    // S <- (a | ab) b
+    fn rules4() {
+        let p = ParserContext{
+            input: String::from("abb").into_bytes(),
+            rules: vec![
+                alt(ch('a', ch('b', succ())), ch('a', ch('b', ch('b', succ()))))
+                ],
+            state: RefCell::new(State{pos: 0, tree: Vec::new()})
+        };
+        p.rules[0](&p);
+        assert!(Tree::Node{sym: 1, child: p.state.into_inner().tree}.to_string(&["Amb", "S"]) == "[S [Amb a a b] b]");
+    }
 }
