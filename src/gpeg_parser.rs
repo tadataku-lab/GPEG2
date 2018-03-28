@@ -27,11 +27,26 @@ pub mod gpeg_parser{
 
     pub fn ch(c: char, e: Box<Fn(& ParserContext) -> bool>) -> Box<Fn(& ParserContext) -> bool> {
         Box::new(move |p: & ParserContext| -> bool {
+            /*
             if p.state.borrow_mut().pos as usize >= p.input.len() {
                 false
             }else {
             if p.input[p.state.borrow_mut().pos as usize] == c as u8 { make_leaf(c, p) && e(p) } else {false} 
             }
+            */
+            let mut new_state = State::new();
+
+            for pos in p.state.pos {
+                if pos as usize >= p.input.len() {
+                    break
+                }else if p.input[pos as usize] == c as u8 {
+                    new_state.make_leaf(pos, p.state.tree[pos as usize]) 
+                }
+            }
+
+            p.state.borrow_mut().set(new_state);
+
+            !new_state.is_empty() && e(p)
         })
     }
 

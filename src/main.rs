@@ -12,7 +12,7 @@ fn main() {
         rules: vec![
             alt(ch('a', succ()), ch('a', ch('b', succ()))),
             ],
-        state: RefCell::new(State{pos: 0, tree: Vec::new()})
+        state: RefCell::new(State::new())
     };
     p.rules[0](&p);
     println!("{}", Tree::Node{sym: 1, child: p.state.into_inner().tree}.to_string(&["Amb", "S"]));
