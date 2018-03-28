@@ -22,6 +22,12 @@ pub mod state{
             new
         }
 
+        pub fn new_child(pos: usize) -> State {
+            let mut new = State{pos: BitSet::new(), tree: Vec::new()};
+            new.pos.insert(pos);
+            new
+        }
+
         pub fn set(&mut self, other: State){
             *self = other;
         }
@@ -30,9 +36,13 @@ pub mod state{
             self.pos.is_empty()
         }
 
-        pub fn make_leaf(&mut self, c: char){
-            self.pos += 1;
-            self.tree.push(Tree::Leaf(c));
+        pub fn make_leaf(&mut self, c: char, pos: usize, tree: Vec<Tree>){
+            self.pos.insert(pos + 1);
+            self.tree[pos + 1] = tree.push(Tree::Leaf(c));
+        }
+
+        pub fn make_node(&mut self, symbol: usize, pos: usize, prev_tree: Vec<Tree>, child: State){
+            // define later
         }
 
         pub fn merge(&mut self, mut other: State){

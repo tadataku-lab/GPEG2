@@ -36,11 +36,11 @@ pub mod gpeg_parser{
             */
             let mut new_state = State::new();
 
-            for pos in p.state.pos {
+            for pos in p.state.borrow().pos.iter() {
                 if pos as usize >= p.input.len() {
-                    break
+                    break;
                 }else if p.input[pos as usize] == c as u8 {
-                    new_state.make_leaf(pos, p.state.tree[pos as usize]) 
+                    new_state.make_leaf(c, pos, p.state.borrow_mut().tree[pos as usize]);
                 }
             }
 
@@ -52,9 +52,26 @@ pub mod gpeg_parser{
 
     pub fn nonterm(symbol: usize, e: Box<Fn(& ParserContext) -> bool>) -> Box<Fn(& ParserContext) -> bool> {
         Box::new(move |p: & ParserContext| -> bool {
+            /*
             let prev_tree = p.state.borrow_mut().tree.clone();
             p.state.borrow_mut().tree.clear();
             if p.rules[symbol](p) {make_node(symbol, prev_tree, p) && e(p)} else {false}
+            */
+
+            let mut new_state = State::new();
+            let old_state = p.state.borrow().clone();
+
+            for pos in old_state.pos.iter() {
+                p.state.borrow_mut().set(State::new_child(pos as usize));
+                if p.rules[symbol](p) {
+                    new_state.make_node(symbol, pos as usize, old_state.tree[pos], p.state.into_inner())
+                }
+            }
+
+            p.state.borrow_mut().set(new_state);
+
+            !new_state.is_empty() && e(p)
+
         })
     }
 
