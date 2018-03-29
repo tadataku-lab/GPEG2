@@ -41,8 +41,17 @@ pub mod state{
             self.tree[pos + 1] = tree.push(Tree::Leaf(c));
         }
 
-        pub fn make_node(&mut self, symbol: usize, pos: usize, prev_tree: Vec<Tree>, child: State){
-            // define later
+        pub fn make_node(&mut self, symbol: usize, prev_tree: Vec<Tree>, child: State){
+            for pos in child.pos.iter() {
+                match self.tree[pos as usize].last_mut() {
+                    Some(last) => match last {
+                        &mut Tree::Leaf(_) => self.tree[pos as usize] = vec![Tree::Amb{trees: vec![self.tree[pos as usize]]}, prev_tree.push(Tree::Node{sym: symbol, child.tree[pos as usize].clone()})],
+                        &mut Tree::Node{sym: _, child: _} => self.tree[pos as usize] = vec![Tree::Amb{trees: vec![self.tree[pos as usize]]}, prev_tree.push(Tree::Node{sym: symbol, child.tree[pos as usize].clone()})],
+                        &mut Tree::Amb{trees: ref mut trees} => trees.push(prev_tree.push(Tree::Node{sym: symbol, child.tree[pos as usize].clone()}))
+                    },
+                    None => self.tree[pos as usize] = prev_tree.push(Tree::Node{sym: symbol, child.tree[pos as usize].clone()})
+                }
+            }
         }
 
         pub fn merge(&mut self, mut other: State){

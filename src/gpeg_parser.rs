@@ -64,7 +64,7 @@ pub mod gpeg_parser{
             for pos in old_state.pos.iter() {
                 p.state.borrow_mut().set(State::new_child(pos as usize));
                 if p.rules[symbol](p) {
-                    new_state.make_node(symbol, pos as usize, old_state.tree[pos], p.state.into_inner())
+                    new_state.make_node(symbol, old_state.tree[pos as usize], p.state.into_inner());
                 }
             }
 
