@@ -5,11 +5,12 @@ use gpeg2::gpeg_parser::gpeg_parser::*;
 
 fn main() {
     let p = ParserContext::new(
-        String::from("ab").into_bytes(),
+        String::from("bb").into_bytes(),
         vec![
-            alt(ch('a', succ()), ch('a', ch('b', succ()))),
+            alt(nonterm(1, nonterm(0, nonterm(0, succ()))), nonterm(1, succ())),
+            alt(ch('b', nonterm(1, succ())), ch('b', succ()))
         ]
     );
     p.rules[0](&p);
-    println!("[{}{}]", "S", p.state.into_inner().tree.iter().fold("".to_string(), |ts, t| format!("{} {}", ts, format!("[{}]", t.iter().fold("".to_string(), |ts, t| format!("{}{}",ts, t.to_string(&["Amb", "S"])))))));
+    p.show_tree(&["S", "S'"]);
 }

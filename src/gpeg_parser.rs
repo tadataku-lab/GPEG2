@@ -12,7 +12,7 @@ pub mod gpeg_parser{
 
     pub fn ch(c: char, e: Box<Fn(& ParserContext) -> bool>) -> Box<Fn(& ParserContext) -> bool> {
         Box::new(move |p: & ParserContext| -> bool {
-            
+
             let mut new_state = State::new(p.new.clone());
             let old_state = p.state.clone().into_inner();
             
@@ -35,7 +35,7 @@ pub mod gpeg_parser{
 
     pub fn nonterm(symbol: usize, e: Box<Fn(& ParserContext) -> bool>) -> Box<Fn(& ParserContext) -> bool> {
         Box::new(move |p: & ParserContext| -> bool {
-
+            
             let mut new_state = State::new(p.new.clone());
             let old_state = p.state.borrow().clone();
 
@@ -69,6 +69,7 @@ pub mod gpeg_parser{
 
     pub fn alt(left: Box<Fn(& ParserContext) -> bool>, right: Box<Fn(& ParserContext) -> bool>) -> Box<Fn(& ParserContext) -> bool> {
         Box::new(move |p: & ParserContext| -> bool {
+            
             let mut new_state = State::new(p.new.clone());
             let old_state = p.state.borrow().clone();
             for pos in old_state.pos.iter() {

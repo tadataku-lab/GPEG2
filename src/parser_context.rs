@@ -28,6 +28,10 @@ pub mod parser_context{
             }
             new
         }
+
+        pub fn show_tree(&self, symbol: &[&'static str]) -> String{
+            format!("[{} {}]", symbol[0], self.state.borrow().tree.iter().fold("".to_string(), |ts, t| format!("{}{}", if ts == "" {ts} else {format!("{},", ts)}, t.iter().fold("".to_string(), |ts, t| format!("{}{}",ts, t.to_string(symbol))))))
+        }
     }
 
 }
