@@ -74,6 +74,34 @@ mod rules {
             ]
         );
         p.rules[0](&p);
-        assert!(p.show_tree(&["S", "S'"]) == "[S [S' b [S' b [S' b]]]]");
+        assert!(p.show_tree(&["S", "S'"]) == "[S [S' b],[S' b[S' b]]]");
+    }
+
+    #[test]
+    // S <- S' S S | S', S' <- b S' | b
+    fn rules6() {
+        let p = ParserContext::new(
+            String::from("bbb").into_bytes(),
+            vec![
+                alt(nonterm(1, nonterm(0, nonterm(0, succ()))), nonterm(1, succ())),
+                alt(ch('b', nonterm(1, succ())), ch('b', succ()))
+            ]
+        );
+        p.rules[0](&p);
+        assert!(p.show_tree(&["S", "S'"]) == "[S [S' b],[S' b[S' b]],[Amb[[S' b][S [S' b]][S [S' b]],[S' b[S' b[S' b]]]]]");
+    }
+
+    #[test]
+    // S <- S' S S | S', S' <- b S' | b
+    fn rules7() {
+        let p = ParserContext::new(
+            String::from("bbbb").into_bytes(),
+            vec![
+                alt(nonterm(1, nonterm(0, nonterm(0, succ()))), nonterm(1, succ())),
+                alt(ch('b', nonterm(1, succ())), ch('b', succ()))
+            ]
+        );
+        p.rules[0](&p);
+        assert!(p.show_tree(&["S", "S'"]) == "[S [S' b],[S' b[S' b]],[Amb[[S' b][S [S' b]][S [S' b]],[S' b[S' b[S' b]]]],[Amb[[S' b][S [S' b]][S [S' b[S' b]]],[Amb[[S' b][S [S' b[S' b]]],[S' b[S' b]][S [S' b]]][S [S' b]],[S' b[S' b[S' b[S' b]]]]]]");
     }
 }

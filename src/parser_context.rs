@@ -17,7 +17,7 @@ pub mod parser_context{
                 input: input.clone(),
                 new: Self::fill(input.len() + 1),
                 rules: rules,
-                state: RefCell::new(State::new(Self::fill(input.len() + 1)))
+                state: RefCell::new(State::start(Self::fill(input.len() + 1)))
             }
         }
 

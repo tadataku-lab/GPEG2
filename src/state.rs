@@ -11,10 +11,14 @@ pub mod state{
 
     impl State{
 
-        pub fn new(new: Vec<Vec<Tree>>) -> State{
+        pub fn start(new: Vec<Vec<Tree>>) -> State{
             let mut new = State{pos: BitSet::new(), tree: new};
             new.pos.insert(0);
             new
+        }
+
+        pub fn new(new: Vec<Vec<Tree>>) -> State{
+            State{pos: BitSet::new(), tree: new}
         }
 
         pub fn new_child(pos: usize, new: Vec<Vec<Tree>>) -> State {
@@ -39,9 +43,11 @@ pub mod state{
         }
 
         pub fn make_leaf(&mut self, c: char, pos: usize, mut tree: Vec<Tree>){
+            self.pos.remove(pos);
             self.pos.insert(pos + 1);
             tree.push(Tree::Leaf(c));
             self.tree[pos + 1] = tree;
+            self.tree[pos] = vec![Tree::Nil];
         }
 
         pub fn make_node(&mut self, symbol: usize, prev_tree: Vec<Tree>, child: State){
