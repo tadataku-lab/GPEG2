@@ -1,10 +1,12 @@
 pub mod tree{
+
+    use std::rc::Rc;
     #[derive(Debug, Clone)]
     pub enum Tree{
         Nil,
         Leaf(char),
-        Node{sym: usize, child: Vec<Tree>},
-        Amb{trees: Vec<Vec<Tree>>}
+        Node{sym: usize, child: ChildTree},
+        Amb{trees: Vec<ChildTree>}
     }
 
     impl Tree{
@@ -16,5 +18,14 @@ pub mod tree{
                 &Tree::Amb{ref trees} => format!("[Amb[{}]", trees.iter().fold("".to_string(), |ts, t| format!("{}{}", if ts == "" {ts} else {format!("{},", ts)}, t.iter().fold("".to_string(), |ts, t| format!("{}{}",ts, t.to_string(symbol))))))
             }
         }
+    }
+
+    #[derive(Debug, Clone)] 
+    pub enum ChildTree{
+        Nil,
+        Val{val: Rc<Tree>, prev: Rc<ChildTree>},
+    }
+
+    impl ChildTree{
     }
 }

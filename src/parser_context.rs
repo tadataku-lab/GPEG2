@@ -2,11 +2,11 @@ pub mod parser_context{
 
     use std::cell::RefCell;
     use state::state::State;
-    use tree::tree::Tree;
+    use tree::tree::{Tree, ChildTree};
 
     pub struct ParserContext{
         pub input: Vec<u8>,
-        pub new: Vec<Vec<Tree>>,
+        pub new: Vec<ChildTree>,
         pub rules: Vec<Box<Fn(& ParserContext) -> bool>>,
         pub state: RefCell<State>,
         pub memo: RefCell<Vec<Option<State>>>,
@@ -25,10 +25,10 @@ pub mod parser_context{
             }
         }
 
-        fn fill(size: usize) -> Vec<Vec<Tree>>{
+        fn fill(size: usize) -> Vec<ChildTree>{
             let mut new = Vec::new();
             for _ in 0..size{
-                new.push(vec![Tree::Nil]);
+                new.push(ChildTree::Nil);
             }
             new
         }
