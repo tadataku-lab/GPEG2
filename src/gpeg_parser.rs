@@ -40,12 +40,22 @@ pub mod gpeg_parser{
             let old_state = p.state.borrow().clone();
 
             for pos in old_state.pos.iter() {
-                {
-                    p.state.borrow_mut().set(State::new_child(pos as usize, p.new.clone()));
+
+                match p.lookup(pos, symbol) {
+                    Some(memo) => new_state.make_node(symbol, old_state.tree[pos as usize].clone(), memo),
+                    None => {
+                        {
+                            p.state.borrow_mut().set(State::new_child(pos as usize, p.new.clone()));
+                        }
+                        if p.rules[symbol](p) {
+                            new_state.make_node(symbol, old_state.tree[pos as usize].clone(), p.state.borrow().clone());
+                            p.memo(pos, symbol, p.state.borrow().clone());
+                        }else{
+                            p.memo(pos, symbol, State::new(p.new.clone()));
+                        }
+                    },
                 }
-                if p.rules[symbol](p) {
-                    new_state.make_node(symbol, old_state.tree[pos as usize].clone(), p.state.borrow().clone());
-                }
+                
             }
 
             {
