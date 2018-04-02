@@ -1,9 +1,7 @@
 pub mod tree{
 
-    use std::rc::Rc;
     #[derive(Debug, Clone)]
     pub enum Tree{
-        Nil,
         Leaf(char),
         Node{sym: usize, child: ChildTree},
         Amb{trees: Vec<ChildTree>}
@@ -12,10 +10,9 @@ pub mod tree{
     impl Tree{
         pub fn to_string(&self, symbol: &[&'static str]) -> String {
             match self {
-                &Tree::Nil => "".to_string(),
                 &Tree::Leaf(c) => format!("{}", c),
-                &Tree::Node{ref sym, ref child} => format!("[{}{}]", symbol[*sym], child.iter().fold(" ".to_string(), |ts, t| format!("{}{}",ts, t.to_string(symbol)))),
-                &Tree::Amb{ref trees} => format!("[Amb[{}]", trees.iter().fold("".to_string(), |ts, t| format!("{}{}", if ts == "" {ts} else {format!("{},", ts)}, t.iter().fold("".to_string(), |ts, t| format!("{}{}",ts, t.to_string(symbol))))))
+                &Tree::Node{ref sym, ref child} => format!("[{}{}]", symbol[*sym], child.to_string(symbol)),
+                &Tree::Amb{ref trees} => format!("[Amb[{}]", trees.iter().fold("".to_string(), |ts, t| format!("{}{}", if ts == "" {ts} else {format!("{},", ts)}, t.to_string(symbol))))
             }
         }
     }
@@ -23,9 +20,23 @@ pub mod tree{
     #[derive(Debug, Clone)] 
     pub enum ChildTree{
         Nil,
-        Val{val: Rc<Tree>, prev: Rc<ChildTree>},
+        Val{val: Box<Tree>, prev: Box<ChildTree>},
     }
 
     impl ChildTree{
+        pub fn new_val(tree: Tree) -> ChildTree{
+            ChildTree::Val{val: Box::new(tree), prev: Box::new(ChildTree::Nil)}
+        }
+
+        pub fn push_val(tree: Tree, prev: ChildTree) -> ChildTree{
+            ChildTree::Val{val: Box::new(tree), prev: Box::new(prev)}
+        }
+
+        pub fn to_string(&self, symbol: &[&'static str]) -> String{
+            match self {
+                & ChildTree::Nil => "".to_string(),
+                & ChildTree::Val{val: ref val, prev: ref prev} => format!("{}{}", prev.to_string(symbol), val.to_string(symbol))
+            }
+        }
     }
 }

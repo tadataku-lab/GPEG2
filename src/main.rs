@@ -18,7 +18,7 @@ macro_rules! measure {
 
 fn main() {
     let p = ParserContext::new(
-        String::from("bbbbbbbbbbb").into_bytes(),
+        String::from("bbbbbbbbbbbbb").into_bytes(),
         vec![
             alt(nonterm(1, nonterm(0, nonterm(0, succ()))), nonterm(1, succ())),
             alt(ch('b', nonterm(1, succ())), ch('b', succ()))

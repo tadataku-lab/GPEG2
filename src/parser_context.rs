@@ -2,7 +2,7 @@ pub mod parser_context{
 
     use std::cell::RefCell;
     use state::state::State;
-    use tree::tree::{Tree, ChildTree};
+    use tree::tree::{ChildTree};
 
     pub struct ParserContext{
         pub input: Vec<u8>,
@@ -42,7 +42,7 @@ pub mod parser_context{
         }
 
         pub fn show_tree(&self, symbol: &[&'static str]) -> String{
-            format!("[{} {}]", symbol[0], self.state.borrow().tree.iter().fold("".to_string(), |ts, t| format!("{}{}", if ts == "" {ts} else {format!("{},", ts)}, t.iter().fold("".to_string(), |ts, t| format!("{}{}",ts, t.to_string(symbol))))))
+            format!("[{} {}]", symbol[0], self.state.borrow().tree.iter().fold("".to_string(), |ts, t| format!("{}{}", if ts == "" {ts} else {format!("{},", ts)}, t.to_string(symbol))))
         }
 
         pub fn lookup(&self, pos: usize, symbol: usize) -> Option<State> {

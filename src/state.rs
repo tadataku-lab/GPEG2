@@ -1,8 +1,7 @@
 pub mod state{
     extern crate bit_set;
     use tree::tree::{Tree, ChildTree};
-    use self::bit_set::BitSet;
-    use std::rc::Rc;
+    use self::bit_set::BitSet; 
 
     #[derive(Debug, Clone)]
     pub struct State{
@@ -46,23 +45,23 @@ pub mod state{
         pub fn make_leaf(&mut self, c: char, pos: usize, mut tree: ChildTree){
             self.pos.remove(pos);
             self.pos.insert(pos + 1);
-            self.tree[pos + 1] = ChildTree::Val{val: Tree::Leaf(c), tree: tree};
+            self.tree[pos + 1] = ChildTree::push_val(Tree::Leaf(c), tree);
             self.tree[pos] = ChildTree::Nil;
         }
 
         pub fn make_node(&mut self, symbol: usize, prev_tree: ChildTree, child: State){
             for pos in child.pos.iter() {
-                let new_tree = ChildTree::Val{val: Tree::Node{sym: symbol, child: child.tree[pos as usize].clone()}, prev: Rc::new(prev_tree.clone())};
-                match self.tree[pos as usize].clone().last() {
-                    Some(last) => match last {
-                        & Tree::Nil => self.tree[pos as usize] = new_tree,
-                        & Tree::Leaf(_) => self.tree[pos as usize] = vec![Tree::Amb{trees: vec![self.tree[pos as usize].clone(), new_tree]}],
-                        & Tree::Node{sym: _, child: _} => self.tree[pos as usize] = vec![Tree::Amb{trees: vec![self.tree[pos as usize].clone(), new_tree]}],
-                        & Tree::Amb{trees: _} => if let Some(&mut Tree::Amb{ref mut trees}) = self.tree[pos as usize].last_mut() {
-                            trees.push(new_tree);
+                match self.tree[pos as usize].clone(){
+                    ChildTree::Nil => self.tree[pos as usize] = ChildTree::push_val(Tree::Node{sym: symbol, child: child.tree[pos as usize].clone()}, prev_tree.clone()),
+                    ChildTree::Val{val: val, prev: _} => match *val{
+                        Tree::Leaf(_) => self.tree[pos as usize] = ChildTree::new_val(Tree::Amb{trees: vec![self.tree[pos as usize].clone(), ChildTree::push_val(Tree::Node{sym: symbol, child: child.tree[pos as usize].clone()}, prev_tree.clone())]}),
+                        Tree::Node{sym: _, child: _} => self.tree[pos as usize] = ChildTree::new_val(Tree::Amb{trees: vec![self.tree[pos as usize].clone(), ChildTree::push_val(Tree::Node{sym: symbol, child: child.tree[pos as usize].clone()}, prev_tree.clone())]}),
+                        Tree::Amb{trees: trees} => if let &mut ChildTree::Val{val: ref mut val, prev: _} = &mut self.tree[pos as usize] {
+                            if let &mut Tree::Amb{trees: ref mut trees} = &mut **val {
+                                trees.push(ChildTree::push_val(Tree::Node{sym: symbol, child: child.tree[pos as usize].clone()}, prev_tree.clone()))
+                            }
                         }
-                    },
-                    None => self.tree[pos as usize] = new_tree
+                    }
                 }
             }
             self.pos.union_with(&child.pos);
@@ -70,16 +69,17 @@ pub mod state{
 
         pub fn merge(&mut self, other: State){
             for pos in other.pos.iter() {
-                match self.tree[pos as usize].clone().last() {
-                    Some(last) => match last {
-                        & Tree::Nil => self.tree[pos as usize] = other.tree[pos as usize].clone(),
-                        & Tree::Leaf(_) => self.tree[pos as usize] = vec![Tree::Amb{trees: vec![self.tree[pos as usize].clone(), other.tree[pos as usize].clone()]}],
-                        & Tree::Node{sym: _, child: _} => self.tree[pos as usize] = vec![Tree::Amb{trees: vec![self.tree[pos as usize].clone(), other.tree[pos as usize].clone()]}],
-                        & Tree::Amb{trees: _} =>  if let Some(&mut Tree::Amb{ref mut trees}) = self.tree[pos as usize].last_mut() {
-                            trees.push(other.tree[pos as usize].clone());
+                match self.tree[pos as usize].clone() {
+                    ChildTree::Nil => self.tree[pos as usize] = other.tree[pos as usize].clone(),
+                    ChildTree::Val{val: val, prev: _} => match *val{
+                        Tree::Leaf(_) => self.tree[pos as usize] = ChildTree::new_val(Tree::Amb{trees: vec![self.tree[pos as usize].clone(), other.tree[pos as usize].clone()]}),
+                        Tree::Node{sym: _, child: _} => self.tree[pos as usize] = ChildTree::new_val(Tree::Amb{trees: vec![self.tree[pos as usize].clone(), other.tree[pos as usize].clone()]}),
+                        Tree::Amb{trees: trees} => if let &mut ChildTree::Val{val: ref mut val, prev: _} = &mut self.tree[pos as usize] {
+                            if let &mut Tree::Amb{trees: ref mut trees} = &mut **val {
+                                trees.push(other.tree[pos as usize].clone())
+                            }
                         }
-                    },
-                    None => self.tree[pos as usize] = other.tree[pos as usize].clone()
+                    }
                 }
             }
             self.pos.union_with(&other.pos);
