@@ -14,7 +14,7 @@ pub mod gpeg_parser{
         Box::new(move |p: & ParserContext| -> bool {
 
             let mut new_state = State::new(p.new.clone());
-            let old_state = p.state.clone().into_inner();
+            let old_state = p.state.borrow().clone();
             
             for pos in old_state.pos.iter() {
                 if pos as usize >= p.input.len() {

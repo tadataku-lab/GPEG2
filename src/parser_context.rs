@@ -11,6 +11,7 @@ pub mod parser_context{
         pub state: RefCell<State>,
         pub memo: RefCell<Vec<Option<State>>>,
         pub bias: usize,
+        pub bench: RefCell<[i32;1]>
     }
 
     impl ParserContext{
@@ -22,6 +23,7 @@ pub mod parser_context{
                 state: RefCell::new(State::start(Self::fill(input.len() + 1))),
                 bias: rules.len(),
                 rules: rules,
+                bench: RefCell::new([0])
             }
         }
 
@@ -51,6 +53,7 @@ pub mod parser_context{
 
         pub fn memo(&self, pos: usize, symbol: usize, state: State) {
             self.memo.borrow_mut()[ pos * self.bias + symbol] = Some(state);
+            self.bench.borrow_mut()[0] += 1;
         }
     }
 

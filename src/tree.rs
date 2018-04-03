@@ -35,7 +35,7 @@ pub mod tree{
         pub fn to_string(&self, symbol: &[&'static str]) -> String{
             match self {
                 & ChildTree::Nil => "".to_string(),
-                & ChildTree::Val{val: ref val, prev: ref prev} => format!("{}{}", prev.to_string(symbol), val.to_string(symbol))
+                & ChildTree::Val{ ref val, ref prev} => format!("{}{}", prev.to_string(symbol), val.to_string(symbol))
             }
         }
     }
