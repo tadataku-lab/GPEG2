@@ -6,7 +6,7 @@ pub mod parser_context{
 
     pub struct ParserContext{
         pub input: Vec<u8>,
-        pub new: Vec<ChildTree>,
+        pub new: Vec<Vec<ChildTree>>,
         pub rules: Vec<Box<Fn(& ParserContext) -> bool>>,
         pub state: RefCell<State>,
         pub memo: RefCell<Vec<Option<State>>>,
@@ -27,10 +27,10 @@ pub mod parser_context{
             }
         }
 
-        fn fill(size: usize) -> Vec<ChildTree>{
+        fn fill(size: usize) -> Vec<Vec<ChildTree>>{
             let mut new = Vec::new();
             for _ in 0..size{
-                new.push(ChildTree::Nil);
+                new.push(vec![]);
             }
             new
         }
@@ -44,7 +44,7 @@ pub mod parser_context{
         }
 
         pub fn show_tree(&self, symbol: &[&'static str]) -> String{
-            format!("[{} {}]", symbol[0], self.state.borrow().tree.iter().fold("".to_string(), |ts, t| format!("{}{}", if ts == "" {ts} else {format!("{},", ts)}, t.to_string(symbol))))
+            self.state.borrow().show_tree(symbol)
         }
 
         pub fn lookup(&self, pos: usize, symbol: usize) -> Option<State> {
@@ -53,7 +53,7 @@ pub mod parser_context{
 
         pub fn memo(&self, pos: usize, symbol: usize, state: State) {
             self.memo.borrow_mut()[ pos * self.bias + symbol] = Some(state);
-            self.bench.borrow_mut()[0] += 1;
+            //self.bench.borrow_mut()[0] += 1;
         }
     }
 

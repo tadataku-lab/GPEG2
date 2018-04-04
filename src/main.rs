@@ -18,7 +18,7 @@ macro_rules! measure {
 
 fn main() {
     let p = ParserContext::new(
-        String::from("bbbbbbbbbb").into_bytes(),
+        String::from("bbbbbbbbbbbbb").into_bytes(),
         vec![
             alt(nonterm(1, nonterm(0, nonterm(0, succ()))), nonterm(1, succ())),
             alt(ch('b', nonterm(1, succ())), ch('b', succ()))
@@ -29,5 +29,5 @@ fn main() {
         p.rules[0](&p);
     });
     //println!("{}", p.show_tree(&["S", "S'"]));
-    println!("{:?}", p.bench.borrow());
+    //println!("{:?}", p.bench.borrow());
 }

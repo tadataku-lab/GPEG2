@@ -27,7 +27,6 @@ pub mod gpeg_parser{
             {
                 p.state.borrow_mut().set(new_state);
             }
-
             if !p.state.borrow().is_empty() { e(p) } else {false}
             
         })
@@ -79,7 +78,6 @@ pub mod gpeg_parser{
 
     pub fn alt(left: Box<Fn(& ParserContext) -> bool>, right: Box<Fn(& ParserContext) -> bool>) -> Box<Fn(& ParserContext) -> bool> {
         Box::new(move |p: & ParserContext| -> bool {
-            
             let mut new_state = State::new(p.new.clone());
             let old_state = p.state.borrow().clone();
             for pos in old_state.pos.iter() {
@@ -88,21 +86,21 @@ pub mod gpeg_parser{
                     p.state.borrow_mut().set(back_state.clone());
                 }
                 if left(p) {
-                    let left_state = p.state.borrow().clone();
+                    let mut left_state = p.state.borrow().clone();
                     {
                         p.state.borrow_mut().set(back_state);
                     }
                     if right(p) {
-                        new_state.merge(left_state);
-                        new_state.merge(p.state.borrow().clone());
+                        new_state.merge(&mut left_state);
+                        new_state.merge(&mut p.state.borrow().clone());
                     } else{
-                        new_state.merge(left_state);
+                        new_state.merge(&mut left_state);
                     }
                 } else{
                     {
                         p.state.borrow_mut().set(back_state);
                     }
-                    if right(p) { new_state.merge(p.state.borrow().clone())}
+                    if right(p) { new_state.merge(&mut p.state.borrow().clone())}
                 }
             }
 
