@@ -29,5 +29,5 @@ fn main() {
         p.rules[0](&p);
     });
     //println!("{}", p.show_tree(&["S", "S'"]));
-    //println!("{:?}", p.bench.borrow());
+    println!("{:?}", p.bench.borrow());
 }

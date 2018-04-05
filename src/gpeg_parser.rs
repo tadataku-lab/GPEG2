@@ -91,16 +91,16 @@ pub mod gpeg_parser{
                         p.state.borrow_mut().set(back_state);
                     }
                     if right(p) {
-                        new_state.merge(&mut left_state);
-                        new_state.merge(&mut p.state.borrow().clone());
+                        new_state.merge(left_state);
+                        new_state.merge(p.state.borrow().clone());
                     } else{
-                        new_state.merge(&mut left_state);
+                        new_state.merge(left_state);
                     }
                 } else{
                     {
                         p.state.borrow_mut().set(back_state);
                     }
-                    if right(p) { new_state.merge(&mut p.state.borrow().clone())}
+                    if right(p) { new_state.merge(p.state.borrow().clone())}
                 }
             }
 
