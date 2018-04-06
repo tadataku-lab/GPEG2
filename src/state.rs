@@ -49,28 +49,26 @@ pub mod state{
         }
 
         pub fn make_node(&mut self, symbol: usize, prev_tree: ChildTree, child: State){
+            
             for pos in child.pos.iter() {
                 self.tree[pos as usize] = match & self.tree[pos as usize] {
                     & ChildTree::Nil => ChildTree::push_val(Tree::Node{sym: symbol, child: child.tree[pos as usize].clone()}, prev_tree.clone()),
-                    & ChildTree::Val{ref val, prev: _} => match & **val {
-                        & Tree::Amb {trees: _} => ChildTree::Val{val: Box::new(Tree::Amb{trees: ChildTree::push_val(Tree::Node{sym: symbol, child: child.tree[pos as usize].clone()}, prev_tree.clone())}), prev: Box::new(self.tree[pos as usize].clone())},
-                        _ => ChildTree::Val{val: Box::new(Tree::Amb{trees: ChildTree::push_val(Tree::Node{sym: symbol, child: child.tree[pos as usize].clone()}, prev_tree.clone())}), prev: Box::new(self.tree[pos as usize].clone())}
-                    }
+                    & ChildTree::Val{ref val, prev: _} => val.make_amb(ChildTree::push_val(Tree::Node{sym: symbol, child: child.tree[pos as usize].clone()}, prev_tree.clone()), self.tree[pos as usize].clone()),
                 }
             }
+            
             self.pos.union_with(&child.pos);
         }
 
         pub fn merge(&mut self, other: State){
+            
             for pos in other.pos.iter() {
                 self.tree[pos as usize] = match & self.tree[pos as usize] {
                     & ChildTree::Nil => other.tree[pos as usize].clone(),
-                    & ChildTree::Val{ref val, prev: _} => match & **val {
-                        & Tree::Amb {trees: _} => ChildTree::Val{val: Box::new(Tree::Amb{trees: other.tree[pos as usize].clone()}), prev: Box::new(self.tree[pos as usize].clone())},
-                        _ => ChildTree::Val{val: Box::new(Tree::Amb{trees: other.tree[pos as usize].clone()}), prev: Box::new(self.tree[pos as usize].clone())}
-                    }
+                    & ChildTree::Val{ref val, prev: _} => val.make_amb(other.tree[pos as usize].clone(), self.tree[pos as usize].clone()),
                 }
             }
+            
             self.pos.union_with(&other.pos);
         }
 

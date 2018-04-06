@@ -2,6 +2,7 @@ pub mod gpeg_parser{
 
     use parser_context::parser_context::ParserContext;
     use state::state::State;
+    use memo::memo::Memo;
 
     #[allow(unused_variables)]
     pub fn succ() -> Box<Fn(& ParserContext) -> bool> {
@@ -41,16 +42,17 @@ pub mod gpeg_parser{
             for pos in old_state.pos.iter() {
 
                 match p.lookup(pos, symbol) {
-                    Some(memo) => new_state.make_node(symbol, old_state.tree[pos as usize].clone(), memo),
-                    None => {
+                    Memo::Succ(memo) => new_state.make_node(symbol, old_state.tree[pos as usize].clone(), memo),
+                    Memo::Fail => (),
+                    Memo::Nil => {
                         {
                             p.state.borrow_mut().set(State::new_child(pos as usize, p.new.clone()));
                         }
                         if p.rules[symbol](p) {
                             new_state.make_node(symbol, old_state.tree[pos as usize].clone(), p.state.borrow().clone());
-                            p.memo(pos, symbol, p.state.borrow().clone());
+                            p.succ_memo(pos, symbol, p.state.borrow().clone());
                         }else{
-                            p.memo(pos, symbol, State::new(p.new.clone()));
+                            p.fail_memo(pos, symbol);
                         }
                     },
                 }
@@ -86,7 +88,7 @@ pub mod gpeg_parser{
                     p.state.borrow_mut().set(back_state.clone());
                 }
                 if left(p) {
-                    let mut left_state = p.state.borrow().clone();
+                    let left_state = p.state.borrow().clone();
                     {
                         p.state.borrow_mut().set(back_state);
                     }

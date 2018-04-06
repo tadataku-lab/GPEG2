@@ -15,6 +15,13 @@ pub mod tree{
                 &Tree::Amb{ref trees} => format!("[Amb[{}]", trees.to_string(symbol))
             }
         }
+
+        pub fn make_amb(& self, trees: ChildTree, prev: ChildTree) -> ChildTree{
+            match self {
+                & Tree::Amb {trees: _} => ChildTree::Val{val: Box::new(Tree::Amb{trees: trees}), prev: Box::new(prev)},
+                _ => ChildTree::Val{val: Box::new(Tree::Amb{trees: trees}), prev: Box::new(prev)}
+            }
+        } 
     }
 
     #[derive(Debug, Clone)] 
