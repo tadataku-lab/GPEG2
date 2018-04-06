@@ -1,10 +1,12 @@
 pub mod tree{
 
+    use std::rc::Rc;
+
     #[derive(Debug, Clone)]
     pub enum Tree{
         Leaf(char),
-        Node{sym: usize, child: ChildTree},
-        Amb{trees: ChildTree}
+        Node{sym: usize, child: Rc<ChildTree>},
+        Amb{trees: Rc<ChildTree>}
     }
 
     impl Tree{
@@ -16,34 +18,46 @@ pub mod tree{
             }
         }
 
-        pub fn make_amb(& self, trees: ChildTree, prev: ChildTree) -> ChildTree{
-            match self {
-                & Tree::Amb {trees: _} => ChildTree::Val{val: Box::new(Tree::Amb{trees: trees}), prev: Box::new(prev)},
-                _ => ChildTree::Val{val: Box::new(Tree::Amb{trees: trees}), prev: Box::new(prev)}
-            }
-        } 
+        pub fn new_leaf(c: char) -> Rc<Tree>{
+            Rc::new(Tree::Leaf(c))
+        }
+
+        pub fn new_node(sym: usize, child: Rc<ChildTree>) -> Rc<Tree>{
+            Rc::new(Tree::Node{sym: sym, child: child})
+        }
+
+        pub fn new_amb(trees: Rc<ChildTree>) -> Rc<Tree>{
+            Rc::new(Tree::Amb{trees: trees})
+        }
     }
 
     #[derive(Debug, Clone)] 
     pub enum ChildTree{
         Nil,
-        Val{val: Box<Tree>, prev: Box<ChildTree>},
+        Val{val: Rc<Tree>, prev: Rc<ChildTree>},
     }
     
 
     impl ChildTree{
-        pub fn new_val(tree: Tree) -> ChildTree{
-            ChildTree::Val{val: Box::new(tree), prev: Box::new(ChildTree::Nil)}
+        pub fn new_val(tree: Rc<Tree>) -> Rc<ChildTree>{
+            Rc::new(ChildTree::Val{val: tree, prev: Rc::new(ChildTree::Nil)})
         }
 
-        pub fn push_val(tree: Tree, prev: ChildTree) -> ChildTree{
-            ChildTree::Val{val: Box::new(tree), prev: Box::new(prev)}
+        pub fn push_val(tree: Rc<Tree>, prev: Rc<ChildTree>) -> Rc<ChildTree>{
+            Rc::new(ChildTree::Val{val: tree, prev: prev})
         }
 
         pub fn to_string(&self, symbol: &[&'static str]) -> String{
             match self {
                 & ChildTree::Nil => "".to_string(),
                 & ChildTree::Val{ ref val, ref prev} => format!("{}{}", prev.to_string(symbol), val.to_string(symbol))
+            }
+        }
+
+        pub fn make_amb(&self, trees: Rc<ChildTree>, prev: Rc<ChildTree>) -> Rc<ChildTree>{
+            match self {
+                & ChildTree::Nil => trees.clone(),
+                & ChildTree::Val{val: _, prev: _} => ChildTree::push_val(Tree::new_amb(trees), prev),
             }
         }
 

@@ -4,10 +4,11 @@ pub mod parser_context{
     use state::state::State;
     use tree::tree::ChildTree;
     use memo::memo::Memo;
+    use std::rc::Rc;
 
     pub struct ParserContext{
         pub input: Vec<u8>,
-        pub new: Vec<ChildTree>,
+        pub new: Vec<Rc<ChildTree>>,
         pub rules: Vec<Box<Fn(& ParserContext) -> bool>>,
         pub state: RefCell<State>,
         pub memo: RefCell<Vec<Memo>>,
@@ -28,10 +29,10 @@ pub mod parser_context{
             }
         }
 
-        fn fill(size: usize) -> Vec<ChildTree>{
+        fn fill(size: usize) -> Vec<Rc<ChildTree>>{
             let mut new = Vec::new();
             for _ in 0..size{
-                new.push(ChildTree::Nil);
+                new.push(Rc::new(ChildTree::Nil));
             }
             new
         }
@@ -49,7 +50,7 @@ pub mod parser_context{
         }
 
         pub fn lookup(&self, pos: usize, symbol: usize) -> Memo {
-            self.bench.borrow_mut()[0] += 1;
+            //self.bench.borrow_mut()[0] += 1;
             self.memo.borrow()[ pos * self.bias + symbol].clone()
         }
 
