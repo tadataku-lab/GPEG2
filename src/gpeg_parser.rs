@@ -70,11 +70,28 @@ pub mod gpeg_parser{
 
     pub fn choice(left: Box<Fn(& ParserContext) -> bool>, right: Box<Fn(& ParserContext) -> bool>, e: Box<Fn(& ParserContext) -> bool>) -> Box<Fn(& ParserContext) -> bool> {
         Box::new(move |p: & ParserContext| -> bool {
-            let back_state = p.state.clone();
-            if left(p) { e(p) } else{ 
-                p.state.borrow_mut().set(back_state.into_inner());
-                right(p) && e(p)
-            } 
+            let mut new_state = State::new(p.new.clone());
+            let old_state = p.state.borrow().clone();
+            for pos in old_state.pos.iter() {
+                let back_state = p.state.borrow().new_back(pos as usize, p.new.clone());
+                {
+                    p.state.borrow_mut().set(back_state.clone());
+                }
+                if left(p) {
+                    new_state.merge(p.state.borrow().clone());
+                } else{
+                    {
+                        p.state.borrow_mut().set(back_state);
+                    }
+                    if right(p) { new_state.merge(p.state.borrow().clone())}
+                }
+            }
+
+            {
+                p.state.borrow_mut().set(new_state);
+            }
+
+            if !p.state.borrow().is_empty() { e(p) } else {false}
         })
     }
 
