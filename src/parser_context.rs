@@ -2,13 +2,11 @@ pub mod parser_context{
 
     use std::cell::RefCell;
     use state::state::State;
-    use tree::tree::ChildTree;
     use memo::memo::Memo;
     use std::rc::Rc;
 
     pub struct ParserContext{
         pub input: Vec<u8>,
-        pub new: Vec<Rc<ChildTree>>,
         pub rules: Vec<Box<Fn(& ParserContext) -> bool>>,
         pub state: RefCell<State>,
         pub memo: RefCell<Vec<Memo>>,
@@ -20,21 +18,12 @@ pub mod parser_context{
         pub fn new(input: Vec<u8>, rules: Vec<Box<Fn(& ParserContext) -> bool>>) -> ParserContext{
             ParserContext{
                 input: input.clone(),
-                new: Self::fill(input.len() + 1),
                 memo: RefCell::new(Self::new_memo( (input.len() + 1) * rules.len() )),
-                state: RefCell::new(State::start(Self::fill(input.len() + 1))),
+                state: RefCell::new(State::start()),
                 bias: rules.len(),
                 rules: rules,
                 bench: RefCell::new([0])
             }
-        }
-
-        fn fill(size: usize) -> Vec<Rc<ChildTree>>{
-            let mut new = Vec::new();
-            for _ in 0..size{
-                new.push(Rc::new(ChildTree::Nil));
-            }
-            new
         }
 
         fn new_memo(size: usize) -> Vec<Memo> {

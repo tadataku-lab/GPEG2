@@ -26,7 +26,7 @@ fn main() {
     for _ in 0..args[1].parse().unwrap(){
         many_b = format!("{}{}", many_b, "b")
     }
-
+/*
     // S = S S S / S S / b
     let p = ParserContext::new(
         many_b.into_bytes(),
@@ -35,9 +35,9 @@ fn main() {
             choice(ch('b', nonterm(1, succ())), ch('b', succ()), succ())
         ]
     );
-
+*/
     // S = S S S | S S | b
-/*
+
     let p = ParserContext::new(
         many_b.into_bytes(),
         vec![
@@ -45,7 +45,7 @@ fn main() {
             alt(ch('b', nonterm(1, succ())), ch('b', succ()))
         ]
     );
-*/
+
     measure!({
         p.rules[0](&p);
     });
