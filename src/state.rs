@@ -55,7 +55,7 @@ pub mod state{
             }
 
             for pos in child.pos.intersection(&self.pos) {
-                let bufbuf = self.tree[&pos].make_amb(ChildTree::push_val(Tree::new_node(symbol, child.tree[&pos].clone()), prev_tree.clone()), self.tree[&pos].clone());
+                let bufbuf = ChildTree::make_amb(ChildTree::push_val(Tree::new_node(symbol, child.tree[&pos].clone()), prev_tree.clone()), self.tree[&pos].clone());
                 self.tree.insert(pos as usize, bufbuf);
             }
 
@@ -70,7 +70,7 @@ pub mod state{
             }
             
             for pos in other.pos.intersection(&self.pos) {
-                let bufbuf = self.tree[&pos].make_amb(other.tree[&pos].clone(), self.tree[&pos].clone());
+                let bufbuf = ChildTree::make_amb(other.tree[&pos].clone(), self.tree[&pos].clone());
                 self.tree.insert(pos as usize, bufbuf);
             }
             

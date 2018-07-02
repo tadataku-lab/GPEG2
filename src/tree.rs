@@ -54,10 +54,10 @@ pub mod tree{
             }
         }
 
-        pub fn make_amb(&self, trees: Rc<ChildTree>, prev: Rc<ChildTree>) -> Rc<ChildTree>{
-            match self {
-                & ChildTree::Nil => trees,
-                & ChildTree::Val{val: _, prev: _} => ChildTree::push_val(Tree::new_amb(trees), prev),
+        pub fn make_amb(trees: Rc<ChildTree>, prev: Rc<ChildTree>) -> Rc<ChildTree>{
+            match *prev {
+                ChildTree::Nil => trees,
+                ChildTree::Val{val: _, prev: _} => ChildTree::push_val(Tree::new_amb(trees), prev),
             }
         }
 
