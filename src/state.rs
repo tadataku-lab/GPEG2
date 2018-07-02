@@ -1,14 +1,18 @@
 pub mod state{
     extern crate bit_set;
+    extern crate fnv;
     use tree::tree::{Tree, ChildTree};
     use self::bit_set::BitSet;
     use std::rc::Rc;
     use std::collections::HashMap;
+    use std::hash::BuildHasherDefault;
+    use self::fnv::FnvHasher;
+    type MyHasher = BuildHasherDefault<FnvHasher>;
 
     #[derive(Debug, Clone)]
     pub struct State{
         pub pos: BitSet,
-        pub tree: HashMap<usize, Rc<ChildTree>>
+        pub tree: HashMap<usize, Rc<ChildTree>, MyHasher>
     }
 
     impl State{
@@ -18,7 +22,7 @@ pub mod state{
         }
 
         pub fn new() -> State{
-            State{pos: BitSet::new(), tree: HashMap::new()}
+            State{pos: BitSet::new(), tree: HashMap::default()}
         }
 
         pub fn new_child(pos: usize) -> State {
