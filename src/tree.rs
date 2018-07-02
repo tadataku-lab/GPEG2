@@ -56,7 +56,7 @@ pub mod tree{
 
         pub fn make_amb(&self, trees: Rc<ChildTree>, prev: Rc<ChildTree>) -> Rc<ChildTree>{
             match self {
-                & ChildTree::Nil => trees.clone(),
+                & ChildTree::Nil => trees,
                 & ChildTree::Val{val: _, prev: _} => ChildTree::push_val(Tree::new_amb(trees), prev),
             }
         }
