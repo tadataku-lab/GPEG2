@@ -1,14 +1,15 @@
 pub mod state{
     extern crate bit_set;
+    extern crate indexmap;
     use tree::tree::{Tree, ChildTree};
     use self::bit_set::BitSet;
     use std::rc::Rc;
-    use std::collections::HashMap;
+    use self::indexmap::IndexMap;
 
     #[derive(Debug, Clone)]
     pub struct State{
         pub pos: BitSet,
-        pub tree: HashMap<usize, Rc<ChildTree>>
+        pub tree: IndexMap<usize, Rc<ChildTree>>
     }
 
     impl State{
@@ -18,7 +19,7 @@ pub mod state{
         }
 
         pub fn new() -> State{
-            State{pos: BitSet::new(), tree: HashMap::new()}
+            State{pos: BitSet::new(), tree: IndexMap::new()}
         }
 
         pub fn new_child(pos: usize) -> State {
