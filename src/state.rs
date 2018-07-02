@@ -51,12 +51,12 @@ pub mod state{
         pub fn make_node(&mut self, symbol: usize, prev_tree: Rc<ChildTree>, child: State){
 
             for pos in child.pos.difference(&self.pos) {
-                self.tree.insert(pos as usize, ChildTree::push_val(Tree::new_node(symbol, child.tree[&pos].clone()), prev_tree.clone()));
+                self.tree.insert(pos , ChildTree::push_val(Tree::new_node(symbol, child.tree[&pos].clone()), prev_tree.clone()));
             }
 
             for pos in child.pos.intersection(&self.pos) {
-                let bufbuf = ChildTree::make_amb(ChildTree::push_val(Tree::new_node(symbol, child.tree[&pos].clone()), prev_tree.clone()), self.tree[&pos].clone());
-                self.tree.insert(pos as usize, bufbuf);
+                let buf = self.tree[&pos].clone();
+                self.tree.insert(pos , ChildTree::make_amb(ChildTree::push_val(Tree::new_node(symbol, child.tree[&pos].clone()), prev_tree.clone()), buf));
             }
 
             self.pos.union_with(&child.pos);
@@ -66,19 +66,19 @@ pub mod state{
         pub fn merge(&mut self, other: State){
 
             for pos in other.pos.difference(&self.pos){
-                self.tree.insert(pos as usize, other.tree[&pos].clone());
+                self.tree.insert(pos , other.tree[&pos].clone());
             }
             
             for pos in other.pos.intersection(&self.pos) {
-                let bufbuf = ChildTree::make_amb(other.tree[&pos].clone(), self.tree[&pos].clone());
-                self.tree.insert(pos as usize, bufbuf);
+                let buf = self.tree[&pos].clone();
+                self.tree.insert(pos , ChildTree::make_amb(other.tree[&pos].clone(), buf));
             }
             
             self.pos.union_with(&other.pos);
         }
 
         pub fn show_tree(&self, symbol: &[&'static str]) -> String{
-            format!("[{} {}]", symbol[0], self.tree.iter().fold("".to_string(), |ts, (pos, t)| format!("{}{}", if ts == "" {ts} else {format!("{},", ts)}, t.to_string(symbol))))
+            format!("[{} {}]", symbol[0], self.tree.iter().fold("".to_string(), |ts, (_pos, t)| format!("{}{}", if ts == "" {ts} else {format!("{},", ts)}, t.to_string(symbol))))
         }
     }
 }

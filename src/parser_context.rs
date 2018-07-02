@@ -3,7 +3,6 @@ pub mod parser_context{
     use std::cell::RefCell;
     use state::state::State;
     use memo::memo::Memo;
-    use std::rc::Rc;
 
     pub struct ParserContext{
         pub input: Vec<u8>,

@@ -73,7 +73,7 @@ pub mod gpeg_parser{
             let mut new_state = State::new();
             let old_state = p.state.borrow().clone();
             for pos in old_state.pos.iter() {
-                let back_state = p.state.borrow().new_back(pos as usize);
+                let back_state = p.state.borrow().new_back(pos);
                 {
                     p.state.borrow_mut().set(back_state.clone());
                 }
@@ -100,7 +100,7 @@ pub mod gpeg_parser{
             let mut new_state = State::new();
             let old_state = p.state.borrow().clone();
             for pos in old_state.pos.iter() {
-                let back_state = p.state.borrow().new_back(pos as usize);
+                let back_state = p.state.borrow().new_back(pos);
                 {
                     p.state.borrow_mut().set(back_state.clone());
                 }
