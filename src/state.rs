@@ -44,36 +44,36 @@ pub mod state{
         }
 
         pub fn make_leaf(&mut self, c: char, pos: usize, tree: Rc<ChildTree>){
-            self.pos.remove(pos);
             self.pos.insert(pos + 1);
             self.tree.insert(pos + 1, ChildTree::push_val(Tree::new_leaf(c), tree));
         }
 
         pub fn make_node(&mut self, symbol: usize, prev_tree: Rc<ChildTree>, child: State){
 
-            for pos in child.pos.iter() {
-                if self.tree.contains_key(&pos){
-                    let buf = self.tree[&pos].clone();
-                    let bufbuf = self.tree[&pos].make_amb(ChildTree::push_val(Tree::new_node(symbol, child.tree[&pos].clone()), prev_tree.clone()), buf);
-                    self.tree.insert(pos as usize, bufbuf);
-                }else{
-                    self.tree.insert(pos as usize, ChildTree::push_val(Tree::new_node(symbol, child.tree[&pos].clone()), prev_tree.clone()));
-                }
+            for pos in child.pos.difference(&self.pos) {
+                self.tree.insert(pos as usize, ChildTree::push_val(Tree::new_node(symbol, child.tree[&pos].clone()), prev_tree.clone()));
             }
-            
+
+            for pos in child.pos.intersection(&self.pos) {
+                let buf = self.tree[&pos].clone();
+                let bufbuf = self.tree[&pos].make_amb(ChildTree::push_val(Tree::new_node(symbol, child.tree[&pos].clone()), prev_tree.clone()), buf);
+                self.tree.insert(pos as usize, bufbuf);
+            }
+
             self.pos.union_with(&child.pos);
+            
         }
 
         pub fn merge(&mut self, other: State){
+
+            for pos in other.pos.difference(&self.pos){
+                self.tree.insert(pos as usize, other.tree[&pos].clone());
+            }
             
-            for pos in other.pos.iter() {
-                if self.tree.contains_key(&pos){
-                    let buf = self.tree[&pos].clone();
-                    let bufbuf = self.tree[&pos].make_amb(other.tree[&pos].clone(), buf);
-                    self.tree.insert(pos as usize, bufbuf);
-                }else{
-                    self.tree.insert(pos as usize, other.tree[&pos].clone());
-                }
+            for pos in other.pos.intersection(&self.pos) {
+                let buf = self.tree[&pos].clone();
+                let bufbuf = self.tree[&pos].make_amb(other.tree[&pos].clone(), buf);
+                self.tree.insert(pos as usize, bufbuf);
             }
             
             self.pos.union_with(&other.pos);
