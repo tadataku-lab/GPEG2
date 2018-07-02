@@ -3,12 +3,12 @@ pub mod state{
     use tree::tree::{Tree, ChildTree};
     use self::bit_set::BitSet;
     use std::rc::Rc;
-    use std::collections::HashMap;
+    use std::collections::BTreeMap;
 
     #[derive(Debug, Clone)]
     pub struct State{
         pub pos: BitSet,
-        pub tree: HashMap<usize, Rc<ChildTree>>
+        pub tree: BTreeMap<usize, Rc<ChildTree>>
     }
 
     impl State{
@@ -18,7 +18,7 @@ pub mod state{
         }
 
         pub fn new() -> State{
-            State{pos: BitSet::new(), tree: HashMap::new()}
+            State{pos: BitSet::new(), tree: BTreeMap::new()}
         }
 
         pub fn new_child(pos: usize) -> State {
