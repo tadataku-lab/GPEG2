@@ -39,28 +39,28 @@ fn main() {
     let fullamb2 = vec![
             alt(nonterm(1, nonterm(0, succ())), nonterm(1, succ())),
             alt(nonterm(2, nonterm(1, succ())), nonterm(2, succ())),
-            alt(ch('b', nonterm(2, succ())), ch('b', succ()))
+            alt(ch('b', nonterm(1, succ())), ch('b', succ()))
         ];
 
     #[allow(unused_variables)]
     let order1 = vec![
             choice(nonterm(1, nonterm(0, succ())), nonterm(1, succ()), succ()),
             alt(nonterm(2, nonterm(1, succ())), nonterm(2, succ())),
-            alt(ch('b', nonterm(2, succ())), ch('b', succ()))
+            alt(ch('b', nonterm(1, succ())), ch('b', succ()))
         ];
 
     #[allow(unused_variables)]
     let order2 = vec![
             alt(nonterm(1, nonterm(0, succ())), nonterm(1, succ())),
             choice(nonterm(2, nonterm(1, succ())), nonterm(2, succ()), succ()),
-            alt(ch('b', nonterm(2, succ())), ch('b', succ()))
+            alt(ch('b', nonterm(1, succ())), ch('b', succ()))
         ];
     
     #[allow(unused_variables)]
     let determin2 = vec![
             choice(nonterm(1, nonterm(0, succ())), nonterm(1, succ()), succ()),
             choice(nonterm(2, nonterm(1, succ())), nonterm(2, succ()), succ()),
-            choice(ch('b', nonterm(2, succ())), ch('b', succ()), succ())
+            choice(ch('b', nonterm(1, succ())), ch('b', succ()), succ())
         ];
     
     // S = S S S / S S / b
