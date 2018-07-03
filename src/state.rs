@@ -3,7 +3,6 @@ pub mod state{
     extern crate fnv;
     use tree::tree::{Tree, ChildTree};
     use self::bit_set::BitSet;
-    use std::rc::Rc;
     use std::collections::HashMap;
     use std::hash::BuildHasherDefault;
     use self::fnv::FnvHasher;
@@ -12,7 +11,7 @@ pub mod state{
     #[derive(Debug, Clone)]
     pub struct State{
         pub pos: BitSet,
-        pub tree: HashMap<usize, Rc<ChildTree>, MyHasher>
+        pub tree: HashMap<usize, Box<ChildTree>, MyHasher>
     }
 
     impl State{
@@ -28,7 +27,7 @@ pub mod state{
         pub fn new_child(pos: usize) -> State {
             let mut new = Self::new();
             new.pos.insert(pos);
-            new.tree.insert(pos, Rc::new(ChildTree::Nil));
+            new.tree.insert(pos, Box::new(ChildTree::Nil));
             new
         }
 
@@ -47,12 +46,12 @@ pub mod state{
             self.pos.is_empty()
         }
 
-        pub fn make_leaf(&mut self, c: char, pos: usize, tree: Rc<ChildTree>){
+        pub fn make_leaf(&mut self, c: char, pos: usize, tree: Box<ChildTree>){
             self.pos.insert(pos + 1);
             self.tree.insert(pos + 1, ChildTree::push_val(Tree::new_leaf(c), tree));
         }
 
-        pub fn make_node(&mut self, symbol: usize, prev_tree: Rc<ChildTree>, child: State){
+        pub fn make_node(&mut self, symbol: usize, prev_tree: Box<ChildTree>, child: State){
 
             for pos in child.pos.difference(&self.pos) {
                 self.tree.insert(pos , ChildTree::push_val(Tree::new_node(symbol, child.tree[&pos].clone()), prev_tree.clone()));
