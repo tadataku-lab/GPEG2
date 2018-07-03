@@ -57,7 +57,7 @@ fn main() {
 
     let p = ParserContext::new(
         many_b.into_bytes(),
-        order1
+        order2
     );
 
     measure!({
