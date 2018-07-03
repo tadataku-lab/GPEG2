@@ -26,24 +26,38 @@ fn main() {
     for _ in 0..args[1].parse().unwrap(){
         many_b = format!("{}{}", many_b, "b")
     }
-/*
+
+    // S = S S S | S S | b
+    #[allow(unused_variables)]
+    let fullamb = vec![
+            alt(nonterm(1, nonterm(0, nonterm(0, succ()))), nonterm(1, succ())),
+            alt(ch('b', nonterm(1, succ())), ch('b', succ()))
+        ];
+    
+    // S = S S S / S S | b
+    #[allow(unused_variables)]
+    let order1 = vec![
+            choice(nonterm(1, nonterm(0, nonterm(0, succ()))), nonterm(1, succ()), succ()),
+            alt(ch('b', nonterm(1, succ())), ch('b', succ()))
+        ];
+    
+    // S = S S S | S S / b
+    #[allow(unused_variables)]
+    let order2 = vec![
+            alt(nonterm(1, nonterm(0, nonterm(0, succ()))), nonterm(1, succ())),
+            choice(ch('b', nonterm(1, succ())), ch('b', succ()), succ())
+        ];
+    
     // S = S S S / S S / b
-    let p = ParserContext::new(
-        many_b.into_bytes(),
-        vec![
+    #[allow(unused_variables)]
+    let determin = vec![
             choice(nonterm(1, nonterm(0, nonterm(0, succ()))), nonterm(1, succ()), succ()),
             choice(ch('b', nonterm(1, succ())), ch('b', succ()), succ())
-        ]
-    );
-*/
-    // S = S S S | S S | b
+        ];
 
     let p = ParserContext::new(
         many_b.into_bytes(),
-        vec![
-            alt(nonterm(1, nonterm(0, nonterm(0, succ()))), nonterm(1, succ())),
-            alt(ch('b', nonterm(1, succ())), ch('b', succ()))
-        ]
+        order1
     );
 
     measure!({
